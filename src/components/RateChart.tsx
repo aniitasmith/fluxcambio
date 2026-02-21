@@ -109,8 +109,8 @@ export function RateChart({ asDialog = true, height = 300 }: RateChartProps) {
     );
   };
   
-  const ChartContent = () => (
-    <>
+  const ChartContent = ({ inSidebar = false }: { inSidebar?: boolean }) => (
+    <div className={cn('flex flex-col min-h-0', inSidebar && 'h-full')}>
       <div className="flex flex-wrap gap-2 mb-4 shrink-0">
         <div className="flex gap-1 bg-white/5 rounded-lg p-1">
           {(['7d', '30d', '90d'] as Period[]).map((p) => (
@@ -155,7 +155,7 @@ export function RateChart({ asDialog = true, height = 300 }: RateChartProps) {
         </div>
       </div>
       
-      <div className="flex-1" style={{ minHeight: height }}>
+      <div className="flex-1 min-h-0" style={{ minHeight: inSidebar ? undefined : height }}>
         {filteredData.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <BarChart3 className="w-16 h-16 text-white/20 mb-4" />
@@ -210,13 +210,13 @@ export function RateChart({ asDialog = true, height = 300 }: RateChartProps) {
       </div>
       
       <div className="shrink-0 pt-4 border-t border-white/10">
-        <p className="text-xs text-white/30 text-center">{t.chart.localData}</p>
+        <p className="text-xs text-white/30 text-center truncate">{t.chart.localData}</p>
       </div>
-    </>
+    </div>
   );
   
   if (!asDialog) {
-    return <ChartContent />;
+    return <ChartContent inSidebar />;
   }
   
   return (

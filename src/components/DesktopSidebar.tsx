@@ -62,19 +62,19 @@ export function DesktopSidebar() {
       </GlassCard>
       
       {/* Rate Chart Preview */}
-      <GlassCard className="p-4">
-        <h3 className="text-sm font-medium text-white/70 mb-3 flex items-center gap-2">
+      <GlassCard className="p-4 overflow-hidden flex flex-col min-h-0">
+        <h3 className="text-sm font-medium text-white/70 mb-3 flex items-center gap-2 shrink-0">
           <BarChart3 className="w-4 h-4 text-flux-orange" />
           {t.desktop.rateChart}
         </h3>
-        <div className="h-48">
-          <RateChart asDialog={false} height={180} />
+        <div className="flex flex-col min-h-0 h-48">
+          <RateChart asDialog={false} height={140} />
         </div>
       </GlassCard>
       
       {/* Recent History */}
-      <GlassCard className="p-4">
-        <div className="flex items-center justify-between mb-3">
+      <GlassCard className="p-4 overflow-hidden">
+        <div className="flex items-center justify-between mb-3 shrink-0">
           <h3 className="text-sm font-medium text-white/70 flex items-center gap-2">
             <History className="w-4 h-4 text-flux-orange" />
             {t.desktop.recentHistory}
