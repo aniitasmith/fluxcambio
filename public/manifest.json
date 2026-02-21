@@ -1,0 +1,22 @@
+{
+  "name": "FluxCambio",
+  "short_name": "FluxCambio",
+  "description": "Calculadora de conversión REF a USDT con tasas BCV y Binance P2P",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0f1a",
+  "theme_color": "#F7931A",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["finance", "utilities"],
+  "lang": "es",
+  "dir": "ltr"
+}

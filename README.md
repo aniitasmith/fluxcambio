@@ -1,36 +1,142 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FluxCambio 💱
 
-## Getting Started
+REF to USDT conversion calculator with BCV and Binance P2P rates for Venezuela. Includes arbitrage comparator and CAD conversion.
 
-First, run the development server:
+![FluxCambio](https://img.shields.io/badge/FluxCambio-v1.0.0-F7931A)
+![Next.js](https://img.shields.io/badge/Next.js-16-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+
+## ✨ Features
+
+### 📊 Four calculation modes
+
+- **REF (USD)**: Converts reference dollars to USDT
+- **VES**: Converts bolívars to USD and USDT
+- **VS (Comparator)**: Compares whether it's better to pay in USD or Bolívars
+- **CAD**: Converts Canadian dollars (useful for remittances from Canada)
+
+### 🔄 Real-time rates
+
+- **BCV USD/EUR**: Updated every 20 minutes
+- **Binance P2P**: USDT/VES price updated every 20 minutes
+- **CAD/USD**: Updated every hour
+
+### 📈 History and charts
+
+- Last 50 conversions history
+- Historical rate charts (7, 30, 90 days)
+- CSV export
+
+### 🎨 Modern design
+
+- Glassmorphism interface
+- Orange/gold palette (crypto style)
+- Smooth animations with Framer Motion
+- Responsive design
+
+### 📱 PWA
+
+- Installable as a native app
+- Works offline (except for rate updates)
+
+## 🚀 Installation
 
 ```bash
+# Clone repository
+git clone [your-repo]
+
+# Install dependencies
+npm install
+
+# Run in development
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🔧 Environment variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+No environment variables are required. The APIs used are public:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **DolarVzla API**: Official BCV rate
+- **CriptoYa**: Binance P2P
+- **ExchangeRate API**: CAD/USD rate
 
-## Learn More
+## 📁 Project structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+fluxcambio/
+├── src/
+│   ├── app/
+│   │   ├── api/          # API routes (proxy)
+│   │   ├── layout.tsx    # Main layout
+│   │   └── page.tsx      # Main page
+│   ├── components/
+│   │   ├── ui/           # shadcn/ui
+│   │   ├── Calculator.tsx
+│   │   ├── ArbitrageCompare.tsx
+│   │   ├── CadConverter.tsx
+│   │   ├── ConversionHistory.tsx
+│   │   ├── RateChart.tsx
+│   │   └── ...
+│   ├── hooks/
+│   │   └── useRates.ts   # SWR hook for rates
+│   └── lib/
+│       ├── constants.ts
+│       ├── storage.ts    # LocalStorage helpers
+│       └── utils.ts
+└── public/
+    ├── manifest.json
+    └── favicon.svg
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ Tech stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **Components**: shadcn/ui
+- **Charts**: Recharts
+- **Animations**: Framer Motion
+- **Data Fetching**: SWR
+- **Notifications**: Sonner
 
-## Deploy on Vercel
+## 📝 Usage
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Select the calculation mode (REF, VES, VS, CAD)
+2. Enter the amount
+3. Results are calculated automatically
+4. Tap any result to copy it
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### VS mode (Arbitrage comparator)
+
+Useful when a merchant offers:
+- Price in dollars: $X
+- Price in bolívars: X Bs (calculated with BCV rate)
+
+FluxCambio tells you which option is more convenient considering the real Binance P2P rate.
+
+## 🌐 Deploy
+
+### Vercel (recommended)
+
+```bash
+npm i -g vercel
+vercel
+```
+
+### Other platforms
+
+The project is compatible with any platform that supports Next.js.
+
+## 📄 License
+
+MIT
+
+---
+
+Made with 💛 by FluxCambio
