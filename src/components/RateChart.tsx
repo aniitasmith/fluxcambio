@@ -10,6 +10,8 @@ import {
   DialogTrigger 
 } from '@/components/ui/dialog';
 import { getRateHistory } from '@/lib/storage';
+import { mergeRateHistory, type HistoryRatesResponse } from '@/lib/rateHistory';
+import { API_ENDPOINTS } from '@/lib/constants';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { type RateHistoryItem } from '@/lib/constants';
 import { 
@@ -22,7 +24,7 @@ import {
   Legend,
 } from 'recharts';
 import { BarChart3, TrendingUp } from 'lucide-react';
-import { format, subDays, isAfter } from 'date-fns';
+import { format, subDays, isAfter, startOfDay } from 'date-fns';
 import { es, enUS } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
@@ -35,6 +37,8 @@ const rateConfig: Record<RateKey, { color: string }> = {
   binance: { color: '#10b981' },
   cadUsd: { color: '#3b82f6' },
 };
+
+const CHART_RATE_KEYS: RateKey[] = ['bcvUsd', 'bcvEur', 'binance'];
 
 interface RateChartProps {
   asDialog?: boolean;
@@ -59,20 +63,32 @@ export function RateChart({ asDialog = true, height = 300 }: RateChartProps) {
   };
   
   useEffect(() => {
-    if (isOpen || !asDialog) {
-      setHistory(getRateHistory());
-    }
+    if (!isOpen && asDialog) return;
+
+    const local = getRateHistory();
+    const days = 90;
+
+    setHistory(local);
+
+    fetch(`${API_ENDPOINTS.HISTORY}?days=${days}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((apiData: HistoryRatesResponse | null) => {
+        const merged = mergeRateHistory(local, apiData, days);
+        setHistory(merged.length > 0 ? merged : local);
+      })
+      .catch(() => {});
   }, [isOpen, asDialog]);
   
   const filteredData = useMemo(() => {
     const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
-    const cutoff = subDays(new Date(), days);
+    const cutoff = startOfDay(subDays(new Date(), days));
     
     return history
-      .filter((item) => isAfter(new Date(item.timestamp), cutoff))
+      .filter((item) => item.timestamp >= cutoff.getTime())
       .map((item) => ({
         ...item,
         date: format(new Date(item.timestamp), 'dd/MM', { locale }),
+        dateFull: format(new Date(item.timestamp), 'dd MMM yyyy', { locale }),
         time: format(new Date(item.timestamp), 'HH:mm', { locale }),
       }));
   }, [history, period, locale]);
@@ -89,18 +105,20 @@ export function RateChart({ asDialog = true, height = 300 }: RateChartProps) {
   
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (!active || !payload?.length) return null;
+    const point = payload[0]?.payload;
+    const dateLabel = point?.dateFull ?? point?.date ?? label;
     
     return (
-      <div className="glass-card p-3 rounded-lg text-sm">
-        <p className="text-white/60 mb-2">{label}</p>
+      <div className="bg-black/95 border border-white/20 rounded-lg px-4 py-3 text-sm shadow-xl backdrop-blur-sm">
+        <p className="text-white font-medium mb-2">{dateLabel}</p>
         {payload.map((entry: any) => (
           <div key={entry.dataKey} className="flex items-center gap-2">
-            <div 
-              className="w-2 h-2 rounded-full" 
+            <div
+              className="w-2.5 h-2.5 rounded-full shrink-0"
               style={{ backgroundColor: entry.color }}
             />
-            <span className="text-white/70">{rateLabels[entry.dataKey as RateKey]}:</span>
-            <span className="text-white font-medium">
+            <span className="text-white/90">{rateLabels[entry.dataKey as RateKey]}:</span>
+            <span className="text-white font-semibold">
               {entry.value?.toLocaleString(numberLocale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           </div>
@@ -130,7 +148,7 @@ export function RateChart({ asDialog = true, height = 300 }: RateChartProps) {
         </div>
         
         <div className="flex gap-1 flex-wrap">
-          {(Object.keys(rateConfig) as RateKey[]).map((rate) => (
+          {CHART_RATE_KEYS.map((rate) => (
             <button
               key={rate}
               onClick={() => toggleRate(rate)}
@@ -155,33 +173,42 @@ export function RateChart({ asDialog = true, height = 300 }: RateChartProps) {
         </div>
       </div>
       
-      <div className="flex-1 min-h-0" style={{ minHeight: inSidebar ? undefined : height }}>
+      <div
+        className="flex-1 min-h-0 flex flex-col"
+        style={{ minHeight: inSidebar ? 150 : height }}
+      >
         {filteredData.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center">
+          <div className="flex flex-col items-center justify-center flex-1 min-h-[150px] text-center">
             <BarChart3 className="w-16 h-16 text-white/20 mb-4" />
             <p className="text-white/40 mb-2">{t.chart.noData}</p>
             <p className="text-white/30 text-sm">{t.chart.dataCollection}</p>
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer
+            width="100%"
+            height={inSidebar ? 150 : '100%'}
+            minHeight={150}
+          >
             <LineChart 
               data={filteredData}
-              margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+              margin={{ top: 10, right: 10, left: 0, bottom: 24 }}
             >
               <XAxis 
                 dataKey="date" 
-                stroke="#ffffff40"
-                fontSize={11}
+                stroke="rgba(255,255,255,0.5)"
+                tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 10 }}
+                interval="preserveStartEnd"
+                minTickGap={24}
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis 
                 stroke="#ffffff40"
-                fontSize={11}
+                tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 10 }}
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(value) => value.toLocaleString(numberLocale)}
-                domain={['auto', 'auto']}
+                domain={[0, 'auto']}
               />
               <Tooltip content={<CustomTooltip />} />
               <Legend 
@@ -192,18 +219,20 @@ export function RateChart({ asDialog = true, height = 300 }: RateChartProps) {
                   </span>
                 )}
               />
-              {selectedRates.map((rate) => (
-                <Line
-                  key={rate}
-                  type="monotone"
-                  dataKey={rate}
-                  name={rate}
-                  stroke={rateConfig[rate].color}
-                  strokeWidth={2}
-                  dot={false}
-                  activeDot={{ r: 4, fill: rateConfig[rate].color }}
-                />
-              ))}
+              {selectedRates
+                .filter((rate) => CHART_RATE_KEYS.includes(rate))
+                .map((rate) => (
+                  <Line
+                    key={rate}
+                    type="monotone"
+                    dataKey={rate}
+                    name={rate}
+                    stroke={rateConfig[rate].color}
+                    strokeWidth={2}
+                    dot={false}
+                    activeDot={{ r: 4, fill: rateConfig[rate].color }}
+                  />
+                ))}
             </LineChart>
           </ResponsiveContainer>
         )}
