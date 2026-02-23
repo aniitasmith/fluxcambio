@@ -133,6 +133,10 @@ vercel
 
 The project is compatible with any platform that supports Next.js.
 
+### npm: `node-domexception` deprecated
+
+If you see `npm warn deprecated node-domexception@1.0.0`, it comes from a **devDependency** of the shadcn CLI (`shadcn` → `node-fetch` → `fetch-blob` → `node-domexception`). It does not affect the app at build or runtime. You can ignore it. The project uses `"engines": { "node": ">=18" }`, where `DOMException` is already built-in.
+
 ## 📄 License
 
 MIT
