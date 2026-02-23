@@ -9,23 +9,29 @@ export interface ApiError {
 export interface FetchOptions {
   timeout?: number;
   revalidate?: number;
+  headers?: Record<string, string>;
+  method?: string;
+  body?: string;
 }
 
 const DEFAULT_TIMEOUT = 10000;
 
 export async function fetchWithTimeout(
-  url: string, 
+  url: string,
   options: FetchOptions = {}
 ): Promise<Response> {
-  const { timeout = DEFAULT_TIMEOUT, revalidate } = options;
-  
+  const { timeout = DEFAULT_TIMEOUT, revalidate, headers, method, body } = options;
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
-  
+
   try {
     const response = await fetch(url, {
       signal: controller.signal,
       next: revalidate ? { revalidate } : undefined,
+      headers: headers ? { ...headers } : undefined,
+      method,
+      body,
     });
     return response;
   } finally {

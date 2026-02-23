@@ -7,9 +7,12 @@ export const API_ENDPOINTS = {
 
 export const EXTERNAL_APIS = {
   DOLARVZLA: 'https://api.dolarvzla.com/public/exchange-rate',
+  DOLARVZLA_BCV_HISTORY: 'https://api.dolarvzla.com/public/bcv/exchange-rate/list',
   DOLARAPI_FALLBACK: 'https://ve.dolarapi.com/v1/dolares/oficial',
   CRIPTOYA_BINANCE: 'https://criptoya.com/api/binancep2p/USDT/VES/0.1',
   EXCHANGE_RATE_CAD: 'https://open.er-api.com/v6/latest/CAD',
+  /** Bank of Canada Valet API - daily CAD/USD, no key required */
+  BANK_OF_CANADA_VALET: 'https://www.bankofcanada.ca/valet',
 } as const;
 
 export const CACHE_DURATION = {

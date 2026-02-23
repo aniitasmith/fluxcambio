@@ -11,11 +11,18 @@ export const revalidate = 1200;
 
 const REVALIDATE_TIME = 1200;
 
+const DOLARVZLA_API_KEY = process.env.DOLARVZLA_API_KEY;
+
 export async function GET() {
   try {
+    const headers: Record<string, string> = {};
+    if (DOLARVZLA_API_KEY) {
+      headers['x-dolarvzla-key'] = DOLARVZLA_API_KEY;
+    }
     const response = await fetchWithTimeout(EXTERNAL_APIS.DOLARVZLA, {
       revalidate: REVALIDATE_TIME,
       timeout: 8000,
+      headers: Object.keys(headers).length > 0 ? headers : undefined,
     });
     
     if (!response.ok) {
