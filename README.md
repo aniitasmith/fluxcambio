@@ -43,7 +43,7 @@ REF to USDT conversion calculator with BCV and Binance P2P rates for Venezuela. 
 
 ```bash
 # Clone repository
-git clone [your-repo]
+git clone
 
 # Install dependencies
 npm install
